@@ -1,0 +1,30 @@
+{
+  "name": "venture-web",
+  "version": "1.0.0",
+  "description": "Venture web client",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ugurkodak/venture-web.git"
+  },
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config webpack.config.js"
+  },
+  "author": "Ugur Kodak",
+  "license": "ISC",
+  "dependencies": {
+    "css-loader": "^1.0.0",
+    "firebase": "^5.5.4",
+    "path": "^0.12.7",
+    "xterm": "^3.8.0"
+  },
+  "devDependencies": {
+    "style-loader": "^0.23.1",
+    "ts-loader": "^5.2.2",
+    "typescript": "^3.1.3",
+    "typings-for-css-modules-loader": "^1.7.0",
+    "webpack": "^4.20.2",
+    "webpack-cli": "^3.1.2"
+  }
+}
