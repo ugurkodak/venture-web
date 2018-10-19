@@ -50,52 +50,52 @@ export class Terminal {
         this.setHeight('100%');
     }
 
-    public print(message: string): void {
+    public print(message: string) {
         let newLine = document.createElement('div');
         newLine.style.whiteSpace = 'pre-wrap';
         newLine.textContent = message;
         this._output.appendChild(newLine);
     }
 
-    public input(message: string, callback: (input: string) => void): void {
+    public input(message: string, callback: (input: string) => void) {
         this.promptInput(message, PROMPT_INPUT, callback);
     }
 
-    public password(message, callback: (input: string) => void): void {
+    public password(message: string, callback: (input: string) => void) {
         this.promptInput(message, PROMPT_PASSWORD, callback);
     }
 
-    public confirm(message, callback: (input: string) => void): void {
+    public confirm(message: string, callback: (input: string) => void) {
         this.promptInput(message, PROMPT_CONFIRM, callback);
     }
 
-    public clear(): void {
+    public clear() {
         this._output.innerHTML = '';
     }
 
-    public sleep(milliseconds: number, callback: (input: string) => void): void {
+    public sleep(milliseconds: number, callback: (input: string) => void) {
         setTimeout(callback, milliseconds);
     }
 
-    public setTextSize(size: string): void {
+    public setTextSize(size: string) {
         this._output.style.fontSize = size;
         this._input.style.fontSize = size;
     }
 
-    public setTextColor(col: string): void {
+    public setTextColor(col: string) {
         this.html.style.color = col;
         this._cursor.style.background = col;
     }
 
-    public setBackgroundColor(col: string): void {
+    public setBackgroundColor(col: string) {
         this.html.style.background = col;
     }
 
-    public setWidth(width: string): void {
+    public setWidth(width: string) {
         this.html.style.width = width;
     }
 
-    public setHeight(height: string): void {
+    public setHeight(height: string) {
         this.html.style.height = height;
     }
 
@@ -114,11 +114,11 @@ export class Terminal {
         }
     }
 
-    public blinkingCursor(bool: boolean): void {
+    public blinkingCursor(bool: boolean) {
         this._shouldBlinkCursor = bool;
     }
 
-    private fireCursorInterval(inputField: HTMLInputElement): void {
+    private fireCursorInterval(inputField: HTMLInputElement) {
         setTimeout(() => {
             if (inputField.parentElement && this._shouldBlinkCursor) {
                 this._cursor.style.visibility = this._cursor.style.visibility === 'visible' ? 'hidden' : 'visible';
@@ -129,7 +129,7 @@ export class Terminal {
         }, 500);
     }
 
-    private promptInput(message: string, PROMPT_TYPE: number, callback: (input: string) => void): void {
+    private promptInput(message: string, PROMPT_TYPE: number, callback: (input: string) => void) {
         let shouldDisplayInput = PROMPT_TYPE === PROMPT_INPUT;
         let inputField = document.createElement('input');
 
@@ -154,7 +154,7 @@ export class Terminal {
         };
 
         inputField.onfocus = () => {
-            inputField.value = this._inputLine.textContent;
+            inputField.value = this._inputLine.textContent as string;
             this._cursor.style.display = 'inline';
         }
 
