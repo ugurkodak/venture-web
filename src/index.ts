@@ -1,9 +1,7 @@
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
-import { Terminal } from 'xterm';
-import * as fit from 'xterm/lib/addons/fit/fit';
-// import xterm_css from 'xterm-css';
+import { IO } from './io';
 
 // Initialize Firebase
 const app = firebase.initializeApp({
@@ -14,15 +12,6 @@ const app = firebase.initializeApp({
     storageBucket: "venture-196117.appspot.com",
     messagingSenderId: "356906761499"
 });
+const database = app.database().ref();
 
-// Initialize terminal
-Terminal.applyAddon(fit);
-const terminal = new Terminal({ cursorBlink: true });
-terminal.open(document.getElementById('terminal-container'));
-fit.fit(terminal);
-const ref = app.database().ref().child('text');
-
-// Test
-ref.on('value', function (snap) {
-    return terminal.writeln(snap.val());
-});
+let io = new IO();
