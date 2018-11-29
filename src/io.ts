@@ -7,41 +7,21 @@ _terminal.setWidth('640px');
 _terminal.setHeight('480px');
 _terminal.enableLocalScrolling(true);
 
-export async function promptAsync(message: string, callback: (input: string) => Promise<null | string>) {
-   
-}
-
-export function prompt(message: string, callback: (input: string) => null | string) {
-    _terminal.input(message, input => {
-        console.log('Prompt Input: ' + input);
-        let inputError = callback(input);
-        if (inputError != null) {
-            printError(inputError as string);
-            prompt(message, callback);
+export async function prompt(message: string | string[], propercase: boolean = false): Promise<string> {
+    let input = await new Promise<string>((resolve) => {
+        if (Array.isArray(message)) {
+            let actionList = '';
+            message.forEach((val, i) => {
+                if (i > 0)
+                    actionList += ' | ';
+                actionList += val;
+            });
+            _terminal.input(actionList, resolve);
         }
+        else _terminal.input(message, resolve);
     });
-}
-
-export function promptActions(actions: string[], callback: (action: string) => null | string) {
-    let actionList = '';
-    actions.forEach((val, i) => {
-        if (i > 0)
-            actionList += ' | ';
-        actionList += val;
-    });
-    prompt(actionList, action => {
-        console.log(action);
-        let selectedAction: string[];
-        selectedAction = actions.filter(val => val.toLowerCase() == action.toLowerCase());
-        if (selectedAction.length > 1)
-            return 'Duplicate actions.';
-        else if (selectedAction.length < 1) {
-            return 'Type action to proceed';
-        }
-        else {
-             return callback(selectedAction[0]);
-        }
-    });
+    if (propercase) return input.charAt(0).toUpperCase() + input.toLocaleLowerCase().slice(1);
+    else return input;
 }
 
 export function print(message: string) {
@@ -53,6 +33,20 @@ export function printWithMargin(message: string) {
     _terminal.print(message);
 }
 
-function printError(message: string) {
+export function printError(message: string) {
     printWithMargin('Error: ' + message);
+}
+
+export function printLogo(version?: string) {
+    let v = '';
+    if (version)
+        v = version;
+    print(' __      __        _');
+    print(' \\ \\    / /       | |                 ');
+    print('  \\ \\  / /__ _ __ | |_ _   _ _ __ ___ ');
+    print('   \\ \\/ / _ \\ \'_ \\| __| | | | \'__/ _ \\');
+    print('    \\  /  __/ | | | |_| |_| | | |  __/');
+    print('     \\/ \\___|_| |_|\\__|\\__,_|_|  \\___|' + '  ' + v);
+    print(' ');
+    print(' ');
 }

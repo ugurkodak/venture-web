@@ -3,12 +3,7 @@ import 'firebase/database';
 import * as io from './io';
 import { User } from './user';
 
-export enum Action {
-    Login = 'Login',
-    Register = 'Register',
-    About = 'About',
-    Exit = 'Exit'
-}
+const version = 'v0.1';
 
 //Initialize Firebase
 const app = firebase.initializeApp({
@@ -19,39 +14,65 @@ const app = firebase.initializeApp({
     storageBucket: "venture-196117.appspot.com",
     messagingSenderId: "356906761499"
 });
-
 const databaseRef = app.database().ref();
 let user = new User(databaseRef);
-io.print(' __      __        _');
-io.print(' \\ \\    / /       | |                 ');
-io.print('  \\ \\  / /__ _ __ | |_ _   _ _ __ ___ ');
-io.print('   \\ \\/ / _ \\ \'_ \\| __| | | | \'__/ _ \\');
-io.print('    \\  /  __/ | | | |_| |_| | | |  __/');
-io.print('     \\/ \\___|_| |_|\\__|\\__,_|_|  \\___|');
-io.print(' ');
-io.print(' ');
 
-io.prompt('Press return to start...', input => {
-    io.promptActions([Action.Login, Action.Register, Action.About], action => {
-        switch (action) {
-            case Action.Login: {
-                //PromptAsync
-                break;
-            }
-            case Action.Register: {
-                io.print('Register selected');
-                break;
-            }
-            case Action.About: {
-                io.print('About selected');
-                break;
-            }
-            default: {
-                //TODO: Log
-                return 'Undefined.';
-            }
+(async () => {
+    io.printLogo(version);
+    await io.prompt('Press return to start...');
+    await init();
+})();
+
+async function init() {
+    enum Action {
+        LOGIN = 'Login',
+        REGISTER = 'Register',
+        ABOUT = 'About',
+        EXIT = 'Exit'
+    }
+    let action = await io.prompt([Action.LOGIN, Action.REGISTER, Action.ABOUT, Action.EXIT], true);
+    switch (action) {
+        case Action.LOGIN: {
+            await login();
+            break;
         }
-        return null;
-    });
-    return null;
-});
+        case Action.REGISTER: {
+            await register();
+            break;
+        }
+        case Action.ABOUT: {
+            io.printWithMargin('©2018 Ugur Kodak');
+            await init();
+            break;
+        }
+        case Action.EXIT: {
+            io.printWithMargin('You can exit anytime by closing the browser tab.');
+            await init();
+            break;
+        }
+        default: {
+            await init();
+            break;
+        }
+    }
+}
+
+async function register() {
+    let registirationError = await user.register(await io.prompt('Please type username...'));
+    if (registirationError == null) {
+        io.print('Success.');
+    } else {
+        io.printError(registirationError);
+        await init();
+    }
+}
+
+async function login() {
+    let loginError = await user.login(await io.prompt('Please type username...'));
+    if (loginError == null) {
+        io.print('Success.');
+    } else {
+        io.printError(loginError);
+        await init();
+    }
+}

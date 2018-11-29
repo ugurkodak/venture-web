@@ -12,9 +12,10 @@ export class User {
 
     public async login(userName: string): Promise<null | string> {
         let usersRef = this._database.child('user');
-        let userCheck = await usersRef.equalTo(userName).once('value');
-        if (userCheck.exists) {
+        let user = await usersRef.orderByValue().equalTo(userName).once('value');
+        if (user.exists()) {
             this.name = userName;
+            console.log('New login: ' + user.val());
             return null;
         }
         else {
@@ -26,13 +27,14 @@ export class User {
         let validationError = this.validateUsername(userName);
         if (validationError == null) {
             let usersRef = this._database.child('user');
-            let userCheck = await usersRef.equalTo(userName).once('value');
-            if (userCheck.exists) {
+            let userCheck = await usersRef.orderByValue().equalTo(userName).once('value');
+            if (userCheck.exists()) {
                 return 'User exists.';
             }
             else {
-                usersRef.push(userName);
+                let user = await usersRef.push(userName);
                 this.name = userName;
+                console.log('New registeree: ' + userName);
                 return null;
             }
         }
