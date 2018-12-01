@@ -1,54 +1,25 @@
 import firebase from 'firebase/app';
-//import 'firebase/auth';
+import 'firebase/auth';
 
 export class User {
-    public name: string | null;
+    public data: any | null;
+    private _googleUser: firebase.User | null;
     private _database: firebase.database.Reference;
 
-    constructor(databaseReferance: firebase.database.Reference) {
-        this.name = null;
-        this._database = databaseReferance;
+    constructor(databaseReference: firebase.database.Reference) {
+        this.data = null;
+        this._googleUser = null;
+        this._database = databaseReference;
     }
 
-    public async login(userName: string): Promise<null | string> {
-        let usersRef = this._database.child('user');
-        let user = await usersRef.orderByValue().equalTo(userName).once('value');
-        if (user.exists()) {
-            this.name = userName;
-            console.log('New login: ' + user.val());
-            return null;
-        }
+    public async login(): Promise<null | string> {
+        let provider = new firebase.auth.GoogleAuthProvider();
+        this._googleUser = (await firebase.auth().signInWithPopup(provider)).user;
+        if (this._googleUser == null) return 'Could not complete google authentication.';
         else {
-            return 'User not found.';
+            let snap = await this._database.child(this._googleUser.uid).once('value');
+            if (snap.exists) this.data = snap.val();
         }
-    }
-
-    public async register(userName: string): Promise<null | string> {
-        let validationError = this.validateUsername(userName);
-        if (validationError == null) {
-            let usersRef = this._database.child('user');
-            let userCheck = await usersRef.orderByValue().equalTo(userName).once('value');
-            if (userCheck.exists()) {
-                return 'User exists.';
-            }
-            else {
-                let user = await usersRef.push(userName);
-                this.name = userName;
-                console.log('New registeree: ' + userName);
-                return null;
-            }
-        }
-        else
-            return validationError;
-    }
-
-    private validateUsername(username: string): null | string {
-        for (var i = 0; i < username.length; i++) {
-            if (username.charAt(i) == ' ')
-                return 'Username contains white space';
-        }
-        if (username.length < 4)
-            return 'Username is fewer than 4 characters.';
         return null;
     }
 }
