@@ -7,82 +7,65 @@ _terminal.setWidth('640px');
 _terminal.setHeight('480px');
 _terminal.enableLocalScrolling(true);
 
-
-// export interface IPrompt {
-//     message: string | string[],
-//     validate?(input: string): boolean,
-//     tip?: string,
-//     polar?: boolean,
-//     propercase?: boolean
-// }
-
 /** Prompts user
- * @param message Message or list of of options to show before user input
- * @param polar (optional) Yes-no question?
- * @param proper (optional) Format input to propercase? (e.g input -> Input)
  * @param validate (optional) Function used for input validation. Should return error or null
 */
-export async function newprompt(
-    message: string | string[],
-    polar?: boolean,
-    propercase?: boolean,
-    validate?: (input: string) => string | null): Promise<string> {
-        let multiChoice = Array.isArray(message); 
-        let input = await new Promise<string>((resolve) => {
-            if (multiChoice) {
-                let actionList = '';
-                (message as string[]).forEach((val, i) => {
-                    if (i > 0) actionList += ' | ';
-                    actionList += val;
-                });
-                _terminal.input(actionList, resolve);
-            }
-            else _terminal.input(message as string, resolve);
-        });
-        if (multiChoice) {
-            let validOption = false;
-            input = toPropperCase(input);
-            (message as string[]).forEach(option => {
-                if (input == option) validOption = true;
-            });
-            if (!validOption) {
-                printWithMargin('Please choose from options provided.');
-                await newprompt(message, polar, propercase, validate);
-            }
-        }
-        else if (polar) {
-            input = toPropperCase(input);            
-            if (input == 'Y' || input == 'Yes' || input == 'N' || input == 'No') {
-                printWithMargin('Please answer yes(y) or no(n).');
-                await newprompt(message, polar, propercase, validate);
-            }
-        }
-        else if (propercase) input = toPropperCase(input);
-        if (validate != null) {
-            let validationError = validate(input);
-            if (validationError != null) printWithMargin(validationError);
-            await newprompt(message, polar, propercase, validate);
-        }
-        return input;
-}
-
-export async function prompt(message: string | string[], propercase: boolean = false): Promise<string> {
+export async function prompt(message: string, validate?: (input: string) => string | null): Promise<string> {
     let input = await new Promise<string>((resolve) => {
-        if (Array.isArray(message)) {
-            let actionList = '';
-            message.forEach((val, i) => {
-                if (i > 0) actionList += ' | ';
-                actionList += val;
-            });
-            _terminal.input(actionList, resolve);
-        }
-        else _terminal.input(message, resolve);
+        _terminal.input(message, resolve);
     });
-    if (propercase) return toPropperCase(input);
+    if (validate != (undefined || null)) {
+        let error = validate(input);
+        if (error != (undefined || null)) {
+            printWithMargin(error);
+            return await prompt(message, validate);
+        }
+        else return input;
+    }
     else return input;
 }
 
-export function toPropperCase(string: string): string {
+/** Prompts a yes-no question. */
+export async function promptPolar(question: string): Promise<boolean> {
+    let input = toPropperCase(await new Promise<string>((resolve) => {
+        _terminal.input(question as string, resolve);
+    }));
+    if (input == 'Y' || input == 'Yes') {
+        return true;
+    }
+    else if (input == 'N' || input == 'No') {
+        return false;
+    }
+    else {
+        printWithMargin('Please answer yes(y) or no(n).');
+        return await promptPolar(question);
+    }
+}
+
+/** Prompts a list of predefined options. */
+export async function promptOptions(options: string[], message?: string): Promise<string> {
+    let input = toPropperCase(await new Promise<string>((resolve) => {
+        let optionList = '';
+        options.forEach((val, i) => {
+            if (i > 0) optionList += ' | ';
+            optionList += val;
+        });
+        if (message != (undefined || null)) print(message);
+        _terminal.input(optionList, resolve);
+    }));
+    let validOption = false;
+    options.forEach(option => {
+        if (input == option) validOption = true;
+    });
+    if (!validOption) {
+        printWithMargin('Please choose from provided options.');
+        return await promptOptions(options);
+    }
+    else return input;
+
+}
+
+function toPropperCase(string: string): string {
     return string.charAt(0).toUpperCase() + string.toLocaleLowerCase().slice(1);
 }
 

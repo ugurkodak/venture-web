@@ -30,11 +30,10 @@ async function test_prompt() {
         Two = 'Two',
         Three = 'Three'
     }
-    io.print('Input: ' + (await io.newprompt(Object.values(Option))));
-    io.print('Input: ' + (await io.newprompt('Type something.')));
-    io.print('Input: ' + (await io.newprompt('Yes or No', true)));
-    io.print('Input: ' + (await io.newprompt('Type something lowercase', false, true)));
-    io.print('Input: ' + (await io.newprompt('Type "antidisestablishmentarianism"', false, false, (input) => {
+    io.print('Input: ' + (await io.prompt('Type something.')));
+    io.print('Input: ' + (await io.promptPolar('Yes or No?')));
+    io.print('Input: ' + (await io.promptOptions(Object.values(Option))));
+    io.print('Input: ' + (await io.prompt('Type "antidisestablishmentarianism"', (input) => {
         return (input != 'antidisestablishmentarianism') ? 'You typed something else' : null;
     })));
 }
