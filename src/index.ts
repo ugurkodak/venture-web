@@ -1,11 +1,10 @@
 import firebase from 'firebase/app';
 import 'firebase/database';
 import * as io from './io';
-import * as User from './user';
+import { User } from './user';
+import { Character } from './character';
 
 const version = 'v0.1';
-
-//Initialize Firebase
 const app = firebase.initializeApp({
     apiKey: "AIzaSyAO8agjt4l-vPGeHR85RteTU65Eq229p00",
     authDomain: "venture-196117.firebaseapp.com",
@@ -15,28 +14,15 @@ const app = firebase.initializeApp({
     messagingSenderId: "356906761499"
 });
 const databaseRef = app.database().ref();
-let user = new User.User(databaseRef);
+
+let user = new User(databaseRef);
+let character = new Character(databaseRef);
 
 (async () => {
     io.printLogo(version);
     await io.prompt('Press return to start...');
-    test_prompt();
-    // await init();
+    await init();
 })();
-
-async function test_prompt() {
-    enum Option {
-        One = 'One',
-        Two = 'Two',
-        Three = 'Three'
-    }
-    io.print('Input: ' + (await io.prompt('Type something.')));
-    io.print('Input: ' + (await io.promptPolar('Yes or No?')));
-    io.print('Input: ' + (await io.promptOptions(Object.values(Option))));
-    io.print('Input: ' + (await io.prompt('Type "antidisestablishmentarianism"', (input) => {
-        return (input != 'antidisestablishmentarianism') ? 'You typed something else' : null;
-    })));
-}
 
 async function init() {
     enum Option {
@@ -44,8 +30,7 @@ async function init() {
         ABOUT = 'About',
         EXIT = 'Exit'
     }
-    let option = await io.newprompt(Object.values(Option));
-    // let option = await io.prompt(Object.values(Option), true);
+    let option = await io.promptOptions(Object.values(Option));
     switch (option) {
         case Option.LOGIN: {
             await login();
@@ -62,8 +47,7 @@ async function init() {
             break;
         }
         default: {
-            io.printWithMargin('Please choose from options provided.');
-            await init();
+            io.printError('Unexpected input.');
             break;
         }
     }
@@ -71,37 +55,66 @@ async function init() {
 
 async function register() {
     io.printWithMargin('--Registration--');
-    let confirmName = false;
-    while (!confirmName) {
-        let firstName = await io.prompt('Please enter first name for your character...', true);
-        let lastName = await io.prompt('Please enter last name for your character...', true);
-        io.print('You name will be "' + firstName + ' ' + lastName + '"');
-        if (await io.prompt(['Yes', 'No'], true) == 'Yes') confirmName = true;
+    let firstName = io.toProperCase(await io.prompt('Please enter first name for your character...', validateName));
+    let lastName = io.toProperCase(await io.prompt('Please enter last name for your character...', validateName));
+    let prefix = io.toProperCase(await io.promptOptions(Object.values(Character.Prefix), 'Please select a prefix for your character...'));
+    if (!(await io.promptPolar('You name will be "' + prefix + ' ' + firstName + ' ' + lastName + '"?'))) {
+        io.clear();
+        await register();
     }
-    io.print('Lets review this prompt.');
+    else {
+        let characterCreationError = await character.create({
+            firstName: firstName,
+            lastName: lastName,
+            prefix: prefix as Character.Prefix});
+        if (characterCreationError != null) io.printError(characterCreationError);
+        else if (character.id != null) { 
+            let userRegistrationError = await user.register(character.id);
+            if (userRegistrationError != null) io.printError(userRegistrationError) 
+            else {
+                io.print('Registration successful.');
+                await overview();
+            }
+        }
+        else io.printError('Unexpected error while registering character');
+    }
+
+    function validateName(name: string): null | string {
+        for (var i = 0; i < name.length; i++) if (name.charAt(i) == ' ') return 'Name contains white space';
+        return name.length < 2 ? 'Name is fewer than 2 characters.' : null;
+    }
 }
 
 async function login() {
-    let error = await user.login();
-    if (error != null) io.printError(error);
+    let loginError = await user.login();
+    if (loginError != null) io.printError(loginError);
     else {
         io.print('Login successful');
-        if (user.data == null) await register();
-        else await overview();
+        if (user.characterId == null) await register();
+        else {
+            let characterError = await character.load(user.characterId);
+            if (characterError == null) await overview();
+            else io.printError(characterError);
+        }
     }
 }
 
-// async function characterCreation() {
-//     print()
-//     await io.prompt('Please ');
-// }
-
 async function overview() {
-    io.print('OVERVIEW');
+    io.print('User.characterId: ' + user.characterId);
+    io.print('Character.id: ' + character.id);
+    io.print('Character data: ' + JSON.stringify(character.data));
 }
 
-// function validateName(name: string): null | string {
-//     for (var i = 0; i < name.length; i++) if (name.charAt(i) == ' ') return 'Name contains white space';
-//     if (name.length < 4) return 'Name is fewer than 4 characters.';
-//     return null;
+// async function test_prompt() {
+//     enum Option {
+//         One = 'One',
+//         Two = 'Two',
+//         Three = 'Three'
+//     }
+//     io.print('Input: ' + (await io.prompt('Type something.')));
+//     io.print('Input: ' + (await io.promptPolar('Yes or No?')));
+//     io.print('Input: ' + (await io.promptOptions(Object.values(Option))));
+//     io.print('Input: ' + (await io.prompt('Type "antidisestablishmentarianism"', (input) => {
+//         return (input != 'antidisestablishmentarianism') ? 'You typed something else' : null;
+//     })));
 // }

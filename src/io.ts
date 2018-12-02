@@ -27,7 +27,7 @@ export async function prompt(message: string, validate?: (input: string) => stri
 
 /** Prompts a yes-no question. */
 export async function promptPolar(question: string): Promise<boolean> {
-    let input = toPropperCase(await new Promise<string>((resolve) => {
+    let input = toProperCase(await new Promise<string>((resolve) => {
         _terminal.input(question as string, resolve);
     }));
     if (input == 'Y' || input == 'Yes') {
@@ -44,7 +44,7 @@ export async function promptPolar(question: string): Promise<boolean> {
 
 /** Prompts a list of predefined options. */
 export async function promptOptions(options: string[], message?: string): Promise<string> {
-    let input = toPropperCase(await new Promise<string>((resolve) => {
+    let input = toProperCase(await new Promise<string>((resolve) => {
         let optionList = '';
         options.forEach((val, i) => {
             if (i > 0) optionList += ' | ';
@@ -65,7 +65,7 @@ export async function promptOptions(options: string[], message?: string): Promis
 
 }
 
-function toPropperCase(string: string): string {
+export function toProperCase(string: string): string {
     return string.charAt(0).toUpperCase() + string.toLocaleLowerCase().slice(1);
 }
 
@@ -76,6 +76,10 @@ export function printRealtime(message: string) {
 
 export function print(message: string) {
     _terminal.print(message);
+}
+
+export function clear() {
+    _terminal.clear();
 }
 
 export function printWithMargin(message: string) {
