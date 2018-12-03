@@ -12,6 +12,7 @@ export class User {
         this._database = databaseRootReference.child('user');
     }
 
+    /** Login and set character id if exists */
     public async login(): Promise<null | Error> {
         try {
             this._googleUser = (await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider())).user;
@@ -27,6 +28,7 @@ export class User {
         }
     }
     
+    /** Registers a new user with characterId foreign key */
     public async register(characterId: string): Promise<null | Error> {
         try {
             this.characterId = characterId;

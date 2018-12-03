@@ -78,6 +78,14 @@ export function print(message: string) {
     _terminal.print(message);
 }
 
+export function formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2
+    }).format(amount);
+}
+
 export function clear() {
     _terminal.clear();
 }

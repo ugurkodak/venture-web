@@ -55,26 +55,25 @@ async function init() {
 
 async function register() {
     io.clear();
-    io.printWithMargin('--Registration--');
+    io.printWithMargin('-- Registration --');
     let firstName = io.toProperCase(await io.prompt('Please enter first name for your character...', validateName));
     let lastName = io.toProperCase(await io.prompt('Please enter last name for your character...', validateName));
     let prefix = io.toProperCase(await io.promptOptions(Object.values(Character.Prefix), 'Please select a prefix for your character...'));
     if (!(await io.promptPolar('You name will be "' + prefix + ' ' + firstName + ' ' + lastName + '"?'))) await register();
     else {
-        let characterCreationError = await character.create({
+        await character.create({
             firstName: firstName,
             lastName: lastName,
-            prefix: prefix as Character.Prefix});
-        if (characterCreationError != null) io.printError(characterCreationError);
-        else if (character.id != null) { 
-            let userRegistrationError = await user.register(character.id);
-            if (userRegistrationError != null) io.printError(userRegistrationError) 
-            else {
-                io.print('Registration successful.');
-                await overview();
-            }
+            prefix: prefix as Character.Prefix,
+            balance: Character.INITIAL_BALANCE
+        });
+        //TODO: this error checkings will go away
+        let userRegistrationError = await user.register(character.id);
+        if (userRegistrationError != null) io.printError(userRegistrationError)
+        else {
+            io.print('Registration successful.');
+            await overview();
         }
-        else io.printError(new Error('Unexpected error while registering character'));
     }
 
     function validateName(name: string): null | string {
@@ -99,9 +98,9 @@ async function login() {
 
 async function overview() {
     io.clear();
-    io.print('User.characterId: ' + user.characterId);
-    io.print('Character.id: ' + character.id);
-    io.print('Character data: ' + JSON.stringify(character.data));
+    io.print('-- Overview --');
+    io.print(character.getFullName());
+    io.print('Balance: ' + io.formatCurrency(character.balance));
 }
 
 // async function test_prompt() {
