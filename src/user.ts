@@ -12,30 +12,33 @@ export class User {
         this._database = databaseRootReference.child('user');
     }
 
-    public async login(): Promise<null | string> {
-        let provider = new firebase.auth.GoogleAuthProvider();
-        this._googleUser = (await firebase.auth().signInWithPopup(provider)).user;
-        if (this._googleUser == null) return 'Could not complete google authentication.';
-        else {
-            let snap = await this._database.child(this._googleUser.uid).child('characterId').once('value');
-            if (snap.exists) this.characterId = snap.val();
+    public async login(): Promise<null | Error> {
+        try {
+            this._googleUser = (await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider())).user;
+            if (this._googleUser == null) return new Error('Could not get google user.');
+            else {
+                let snap = await this._database.child(this._googleUser.uid).child('characterId').once('value');
+                if (snap.exists()) this.characterId = snap.val();
+                return null;
+            }
         }
-        return null;
+        catch (error) {
+            return error;
+        }
     }
     
-    public async register(characterId: string): Promise<null | string> {
-        this.characterId = characterId;
-        if (this._googleUser != null) {
-            try {
+    public async register(characterId: string): Promise<null | Error> {
+        try {
+            this.characterId = characterId;
+            if (this._googleUser != null) {
                 await this._database.child(this._googleUser.uid).set({
                     characterId: this.characterId
                 });
             }
-            catch {
-                return 'Could not add user.';
-            }
             return null;
         }
-        else return 'Could not register. User not logged in';
+        catch (error) {
+            return error;
+        }
     }
 }

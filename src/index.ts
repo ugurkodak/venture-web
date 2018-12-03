@@ -47,21 +47,19 @@ async function init() {
             break;
         }
         default: {
-            io.printError('Unexpected input.');
+            io.printError(new Error('Unexpected input.'));
             break;
         }
     }
 }
 
 async function register() {
+    io.clear();
     io.printWithMargin('--Registration--');
     let firstName = io.toProperCase(await io.prompt('Please enter first name for your character...', validateName));
     let lastName = io.toProperCase(await io.prompt('Please enter last name for your character...', validateName));
     let prefix = io.toProperCase(await io.promptOptions(Object.values(Character.Prefix), 'Please select a prefix for your character...'));
-    if (!(await io.promptPolar('You name will be "' + prefix + ' ' + firstName + ' ' + lastName + '"?'))) {
-        io.clear();
-        await register();
-    }
+    if (!(await io.promptPolar('You name will be "' + prefix + ' ' + firstName + ' ' + lastName + '"?'))) await register();
     else {
         let characterCreationError = await character.create({
             firstName: firstName,
@@ -76,7 +74,7 @@ async function register() {
                 await overview();
             }
         }
-        else io.printError('Unexpected error while registering character');
+        else io.printError(new Error('Unexpected error while registering character'));
     }
 
     function validateName(name: string): null | string {
@@ -100,6 +98,7 @@ async function login() {
 }
 
 async function overview() {
+    io.clear();
     io.print('User.characterId: ' + user.characterId);
     io.print('Character.id: ' + character.id);
     io.print('Character data: ' + JSON.stringify(character.data));

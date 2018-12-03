@@ -12,22 +12,28 @@ export class Character {
         this.data = null;
     }
 
-    public async load(characterId: string): Promise<null | string> {
+    public async load(characterId: string): Promise<null | Error> {
         try {
             let snap = await this._database.child(characterId).once('value');
             this.data = snap.val();
             this.id = characterId;
             return null;
         }
-        catch {
-            return 'Could not load character data';
+        catch (error) {
+            return error;
         }
     }
 
-    public async create(data: Character.Data): Promise<null | string> {
-        this.data = data;
-        this.id = (await this._database.push(data)).key;
-        return (this.id == null) ? 'Failed to create character' : null;
+    /** Creates a character entry in the database for the first time. */
+    public async create(data: Character.Data): Promise<null | Error> {
+        try {
+            this.data = data;
+            this.id = (await this._database.push(data)).key;
+            return null;
+        }
+        catch (error) {
+            return error;
+        }
     }
 }
 

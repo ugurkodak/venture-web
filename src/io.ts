@@ -88,8 +88,9 @@ export function printWithMargin(message: string) {
     _terminal.print(' ');
 }
 
-export function printError(message: string) {
-    printWithMargin('Error: ' + message);
+export function printError(error: Error) {
+    printWithMargin('Error: ' + error.message);
+    console.error(error);
 }
 
 export function printLogo(version?: string) {
