@@ -1,52 +1,17 @@
 // import firebase from 'firebase/app';
 // import 'firebase/database';
-import * as Pixi from 'pixi.js'
 // import * as io from './io';
 // import { User } from './user';
 // import { Character } from './character';
 // import { City } from './city';
 
-const pixi = new Pixi.Application({width: 640, height: 360});
-document.body.appendChild(pixi.view);
+import { UI } from './ui';
 
-Pixi.loader.add(["images/test.png"]).load(setup);
+let ui = new UI();
 
-function setup() {
-//   let sprite = new Pixi.Sprite(Pixi.loader.resources["images/test.png"].texture);
-//   pixi.stage.addChild(sprite);
-
-    let hello = new Pixi.Text('Hello world!',{fill: '#ffffff'});
-    hello.anchor.x = 0.5;
-    hello.anchor.y = 0.5;
-    hello.x = 100;
-    hello.y = 50;
-    pixi.stage.addChild(hello);
-
-}
-
-// PIXI.loader.add('bunny', 'bunny.png').load((loader: any, resources: any) => {
-//     // This creates a texture from a 'bunny.png' image
-//     const bunny = new PIXI.Sprite(resources.bunny.texture);
- 
-//     // Setup the position of the bunny
-//     bunny.x = app.renderer.width / 2;
-//     bunny.y = app.renderer.height / 2;
- 
-//     // Rotate around the center
-//     bunny.anchor.x = 0.5;
-//     bunny.anchor.y = 0.5;
- 
-//     // Add the bunny to the scene we are building
-//     app.stage.addChild(bunny);
- 
-//     // Listen for frame updates
-//     app.ticker.add(() => {
-//          // each frame we spin the bunny around a bit
-//         bunny.rotation += 0.01;
-//     });
-// });
-
-
+(async () => {
+    ui.openForm(UI.Form.MAIN_MENU);
+})();
 
 // const version = 'v0.1';
 // const app = firebase.initializeApp({
