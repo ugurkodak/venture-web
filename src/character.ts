@@ -1,5 +1,4 @@
 import firebase from 'firebase/app';
-import 'firebase/auth';
 
 export class Character {
     private _database: firebase.database.Reference;
@@ -8,7 +7,7 @@ export class Character {
     private _firstName: string | null;
     private _lastName: string | null;
     private _balance: number | null;
-    
+
     get id(): string {
         if (this._id != null) return this._id;
         else {
@@ -66,7 +65,7 @@ export class Character {
         this._database = databaseRootReference.child('character');
     }
 
-    public async load(characterId: string): Promise<void> {
+    public async load(characterId: string) {
         try {
             let snap = await this._database.child(characterId).once('value');
             let data = snap.val() as Character.Data;
@@ -79,7 +78,7 @@ export class Character {
     }
 
     /** Creates a character entry in the database for the first time. */
-    public async create(data: Character.Data): Promise<void> {
+    public async create(data: Character.Data) {
         try {
             this._id = (await this._database.push(data)).key;
             this.populateData(data);
@@ -90,7 +89,7 @@ export class Character {
     }
 
     public getFullName(): string {
-            return this.prefix + ' ' + this.firstName + ' ' + this.lastName;
+        return this.prefix + ' ' + this.firstName + ' ' + this.lastName;
     }
 
     private populateData(data: Character.Data) {

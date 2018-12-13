@@ -1,4 +1,5 @@
 const path = require('path');
+const WebpackShellPlugin = require('webpack-shell-plugin');
 
 module.exports = {
     mode: 'development',
@@ -11,21 +12,12 @@ module.exports = {
     },
     resolve: {
         extensions: ['.ts', '.tsx', '.js'],
-        // alias: { 'xterm-css': path.join(__dirname, 'node_modules/xterm/dist/xterm.css') }
     },
+    plugins: [
+        new WebpackShellPlugin({ onBuildEnd: 'node server.js' }) // TODO: Fix deprecation warning
+    ],
     module: {
         rules: [
-            // {
-            //     test: /\.css$/,
-            //     use: ['style-loader', {
-            //         loader: 'typings-for-css-modules-loader',
-            //         options: {
-            //             modules: true,
-            //             namedExport: true,
-            //             camelCase: true
-            //         }
-            //     }]
-            // },
             { test: /\.tsx?$/, use: 'ts-loader' }
         ]
     }

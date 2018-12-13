@@ -27,7 +27,7 @@ export class User {
             return error;
         }
     }
-    
+
     /** Registers a new user with characterId foreign key */
     public async register(characterId: string): Promise<null | Error> {
         try {

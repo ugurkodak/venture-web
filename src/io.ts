@@ -1,4 +1,5 @@
 import { Terminal } from './terminal';
+import * as table from 'text-table';
 
 const _terminal: Terminal = new Terminal();
 
@@ -69,6 +70,11 @@ export function toProperCase(string: string): string {
     return string.charAt(0).toUpperCase() + string.toLocaleLowerCase().slice(1);
 }
 
+export function printTable(headers: string[], data: string[][]) {
+    data.unshift(headers);
+    print(table(data));
+}
+
 export function printRealtime(message: string) {
     _terminal.clear();
     _terminal.print(message);
@@ -82,7 +88,7 @@ export function formatCurrency(amount: number): string {
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
-        minimumFractionDigits: 2
+        minimumFractionDigits: 0
     }).format(amount);
 }
 
