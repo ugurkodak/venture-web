@@ -1,28 +1,143 @@
-// import firebase from 'firebase/app';
-// import 'firebase/database';
-// import * as io from './io';
-// import { User } from './user';
-// import { Character } from './character';
-// import { City } from './city';
+import * as pixi from 'pixi.js';
+import * as data from './data';
 
-import { UI } from './ui';
+class Renderer extends pixi.Application {
+    private _activeForm: Notice | null = null;
+    constructor() {
+        super({ width: 640, height: 360 });
+        document.body.appendChild(this.renderer.view);
+        pixi.loader.add(["images/test.png"]).load(() => {
+            //TODO: Load images here
+        });
+    }
 
-let ui = new UI();
+    public openNotice(formName: NoticeName) {
+        if (this._activeForm != null) this.closeNotice();
+        this._activeForm = new Notice(this, formName);
+        this.stage.addChild(this._activeForm);
+    }
 
+    public closeNotice() {
+        if (this._activeForm != null) this.stage.removeChild(this._activeForm);
+        else {
+            console.error('Tried to close nonexistent form');
+        }
+    }
+
+    public renderCity(data: data.City.Data) {
+        data.tiles.forEach(tile => {
+            let t = pixi.Sprite.fromImage('./images/test.png');
+            t.width = 20;
+            t.height = 20;
+            t.x = tile.x * t.width;
+            t.y = tile.y * t.height;
+            this.stage.addChild(t);
+            console.log(t.x + ', ' + t.y)
+        });
+    }
+}
+class Notice extends pixi.Container {
+    private _renderer: Renderer
+    private _panel: pixi.Sprite = new pixi.Sprite();
+    constructor(renderer: Renderer, noticeName: NoticeName) {
+        super();
+        this._renderer = renderer;
+        switch (noticeName) {
+            case NoticeName.MAIN_MENU: {
+                this.mainMenu();
+                break;
+            }
+            case NoticeName.ABOUT: {
+                this.about();
+                break;
+            }
+        }
+    }
+
+    private mainMenu() {
+        this._panel = new pixi.Sprite(pixi.Texture.WHITE);
+        this._panel.anchor.x = 0.5;
+        this._panel.anchor.y = 0.5;
+        this._panel.width = this._renderer.view.width / 3;
+        this._panel.height = this._renderer.view.height * 0.95;
+        this._panel.x = this._renderer.view.width / 2;
+        this._panel.y = this._renderer.view.height / 2;
+        this.addChild(this._panel);
+        let button_login = new pixi.Text('Login', {
+            fontFamily: "\"Courier New\", Courier, monospace",
+            fontSize: 20
+        });
+        button_login.interactive = true;
+        button_login.anchor.x = 0.5;
+        button_login.anchor.y = 0.5;
+        button_login.x = this._panel.x;
+        button_login.y = this._panel.height * 0.33;
+        button_login.on('click', () => {
+            console.log('Login pressed');
+        });
+        this.addChild(button_login);
+        let button_about = new pixi.Text('About', {
+            fontFamily: "\"Courier New\", Courier, monospace",
+            fontSize: 20
+        });
+        button_about.interactive = true;
+        button_about.anchor.x = 0.5;
+        button_about.anchor.y = 0.5;
+        button_about.x = this._panel.x;
+        button_about.y = this._panel.height * 0.66;
+        button_about.on('click', () => {
+            this._renderer.openNotice(NoticeName.ABOUT);
+        });
+        this.addChild(button_about);
+    }
+
+    private about() {
+        this._panel = new pixi.Sprite(pixi.Texture.WHITE);
+        this._panel.anchor.x = 0.5;
+        this._panel.anchor.y = 0.5;
+        this._panel.width = this._renderer.view.width / 3;
+        this._panel.height = this._renderer.view.height * 0.95;
+        this._panel.x = this._renderer.view.width / 2;
+        this._panel.y = this._renderer.view.height / 2;
+        this.addChild(this._panel);
+
+        let text = new pixi.Text('©2018 Ugur Kodak', {
+            fontFamily: "\"Courier New\", Courier, monospace",
+            fontSize: 20
+        });
+        text.anchor.x = 0.5;
+        text.anchor.y = 0.5;
+        text.x = this._panel.x;
+        text.y = this._panel.height * 0.33;
+        this.addChild(text);
+        let button_close = pixi.Sprite.fromImage('./images/button_report_close.png');
+        button_close.interactive = true;
+        button_close.anchor.x = 0.5;
+        button_close.anchor.y = 0.5;
+        button_close.width = this._panel.width * 0.2;
+        button_close.height = button_close.width;
+        button_close.x = this._panel.x + this._panel.width / 2 - button_close.width / 2;
+        button_close.y = this._panel.y - this._panel.height / 2 + button_close.height / 2;
+        button_close.on('click', () => {
+            this._renderer.openNotice(NoticeName.MAIN_MENU);
+        });
+        this.addChild(button_close);
+    }
+}
+enum NoticeName {
+    MAIN_MENU,
+    LOGIN,
+    ABOUT
+}
+
+//Main
 (async () => {
-    ui.openForm(UI.Form.MAIN_MENU);
+    let renderer = new Renderer();
+    let city = new data.City();
+    city.load(await data.City.create(1));
+    renderer.openNotice(NoticeName.MAIN_MENU);
 })();
 
-// const version = 'v0.1';
-// const app = firebase.initializeApp({
-//     apiKey: "AIzaSyAO8agjt4l-vPGeHR85RteTU65Eq229p00",
-//     authDomain: "venture-196117.firebaseapp.com",
-//     databaseURL: "https://venture-196117.firebaseio.com",
-//     projectId: "venture-196117",
-//     storageBucket: "venture-196117.appspot.com",
-//     messagingSenderId: "356906761499"
-// });
-// const databaseRef = app.database().ref();
 
 // let user = new User(databaseRef);
 // let character = new Character(databaseRef);
