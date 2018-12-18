@@ -2,7 +2,6 @@ import firebase from 'firebase/app';
 import 'firebase/database';
 import 'firebase/auth';
 
-
 const database = firebase.initializeApp({
     apiKey: "AIzaSyAO8agjt4l-vPGeHR85RteTU65Eq229p00",
     authDomain: "venture-196117.firebaseapp.com",
@@ -16,11 +15,11 @@ export class Data {
     private static _instance: Data;
     public user: User | null;
     public character: Character | null;
-    // public city: City | null;
+    public city: City | null;
     constructor() {
         this.user = null;
         this.character = null;
-        // this.city = null;
+        this.city = null;
     }
     static getInstance(): Data {
         if (!Data._instance) {
@@ -29,16 +28,19 @@ export class Data {
         return Data._instance;
     }
 
-    public async register(uid: string, characterInfo: Data.Character.Info): Promise<void> {
+    public async register(uid: string, characterMeta: Data.Character.Meta): Promise<void> {
         try {
-            let characterId = database.child('character').push().key as string;
-            console.log(characterId);
-            await database.child('character').child(characterId).child('info').set(characterInfo);
-            console.log(uid);
-            await database.child('user').child(uid).child('info').set({
+            let updates: any = {};
+            let characterId = database.child('meta').child('character').push().key as string;
+            updates['/meta/character/' + characterId] = characterMeta;
+            let userMeta: Data.User.Meta = {
                 characterId: characterId
-            });
-            this.character = new Character(characterId, characterInfo); //TODO: Should this be here?
+            }
+            updates['/meta/user/' + uid] = userMeta
+            await database.update(updates);
+            this.user = new User(uid, userMeta);
+            this.character = new Character(characterId, characterMeta);
+            //TODO: Load city here
         }
         catch (error) {
             console.error(error);
@@ -53,13 +55,14 @@ export class Data {
                 return null;
             }
             else {
-                let userInfo = (await database.child('user').child(googleUser.uid).child('info').once('value')).val() as Data.User.Info;
-                if (!userInfo) return googleUser.uid;
+                let userMeta = (await database.child('meta').child('user').child(googleUser.uid).once('value')).val() as Data.User.Meta;
+                if (!userMeta) return googleUser.uid;
                 else {
-                    this.user = new User(googleUser.uid, userInfo);
-                    let characterInfo = (await database.child('character').child(userInfo.characterId).child('info').once('value')).val() as Data.Character.Info;
-                    this.character = new Character(userInfo.characterId, characterInfo); //TODO: Should this be here?
+                    this.user = new User(googleUser.uid, userMeta);
+                    let characterInfo = (await database.child('meta').child('character').child(userMeta.characterId).once('value')).val() as Data.Character.Meta;
+                    this.character = new Character(userMeta.characterId, characterInfo);
                     return googleUser.uid;
+                    //TODO: Load city here.
                 }
             }
         }
@@ -71,13 +74,24 @@ export class Data {
 }
 export namespace Data {
     export namespace User {
-        export interface Info {
+        export interface Meta {
             characterId: string,
         }
     }
 
+    export namespace City {
+        export interface Meta {
+            name: string,
+        }
+        export enum TileTexture {
+            Road,
+            Tramway,
+            Land
+        }
+    }
+
     export namespace Character {
-        export interface Info {
+        export interface Meta {
             firstName: string;
             lastName: string;
             prefix: Prefix;
@@ -91,119 +105,101 @@ export namespace Data {
 }
 
 class User {
-    private readonly _collection: firebase.database.Reference;
     public id: string;
-    public _info: Data.User.Info;
-    private _data: User.Data | null;
+    public meta: Data.User.Meta;
+    private _raw: User.Raw | null;
 
-    constructor(id: string, info: Data.User.Info) {
-        this._collection = database.child('user');
+    constructor(id: string, meta: Data.User.Meta) {
         this.id = id;
-        this._info = info;
-        this._data = null;
+        this.meta = meta;
+        this._raw = null;
     }
 }
 
 namespace User {
-    export interface Data {
+    export interface Raw {
 
     }
 }
 
 class Character {
-    private readonly _collection: firebase.database.Reference;
     public id: string;
-    public _info: Data.Character.Info;
-    private _data: Character.Data | null;
+    public meta: Data.Character.Meta;
+    private _raw: Character.Raw | null;
 
-    constructor(id: string, info: Data.Character.Info) {
-        this._collection = database.child('character');
+    constructor(id: string, meta: Data.Character.Meta) {
         this.id = id;
-        this._info = info;
-        this._data = null;
+        this.meta = meta;
+        this._raw = null;
     }
 
     public getFullName(): string {
-        return this._info.prefix + ' ' + this._info.firstName + ' ' + this._info.lastName;
+        return this.meta.prefix + ' ' + this.meta.firstName + ' ' + this.meta.lastName;
     }
 }
 
 namespace Character {
-    export interface Data {
+    export interface Raw {
         balance: number;
     }
 }
 
-// class City {
-//     static db: firebase.database.Reference = dbRoot.child('city');
-//     // private _id: string | null = null;
-//     private _data: City.Data | null = null;
-//     get data(): City.Data {
-//         if (this._data != null) return this._data;
-//         else {
-//             console.error('City data uninitialized.');
-//             return {
-//                 name: "",
-//                 tiles: []
-//             };
-//         }
-//     }
-//     public load(data: City.Data) {
-//         this._data = data;
-//     }
-//     static async create(areas: number, tilesPerLot = 16, lotsPerBlock = 4, blocksPerArea = 6): Promise<City.Data> {
-//         let tiles: City.Tile[] = [];
-//         for (let area = 0; area < areas; area++) {
-//             for (let block = 0; block < blocksPerArea; block++) {
-//                 for (let lot = 0; lot < lotsPerBlock; lot++) {
-//                     for (let tile = 0; tile < tilesPerLot; tile++) {
+class City {
+    public id: string;
+    public meta: Data.City.Meta;
+    private _raw: City.Raw | null;
 
-//                         //TODO: Add lot block and area info to tile positions
-//                         let x = tile % Math.sqrt(tilesPerLot);
-//                         let y = Math.floor(tile / Math.sqrt(tilesPerLot));
+    constructor(id: string, meta: Data.City.Meta) {
+        this.id = id;
+        this.meta = meta;
+        this._raw = null;
+    }
 
-//                         tiles.push({
-//                             x: x,
-//                             y: y,
-//                             rotation: 0,
-//                             lotId: lot,
-//                             blockId: block,
-//                             areaId: area,
-//                             texture: City.TileTexture.Land,
-//                             characterId: City.GOVERNMENT_CHARACTER_ID,
-//                             value: City.LOT_MAX_VALUE / tilesPerLot
-//                         });
-//                     }
-//                 }
-//             }
-//         }
-//         return {
-//             name: "City Name",
-//             tiles: tiles
-//         }
-//     }
-// }
-// namespace City {
-//     export const LOT_MAX_VALUE = 500000;
-//     export const GOVERNMENT_CHARACTER_ID = "gov";
-//     export interface Data {
-//         name: string;
-//         tiles: Tile[];
-//     }
-//     export enum TileTexture {
-//         Road,
-//         Tramway,
-//         Land
-//     }
-//     export interface Tile {
-//         x: number;
-//         y: number;
-//         rotation: number;
-//         lotId: number;
-//         blockId: number;
-//         areaId: number;
-//         texture: TileTexture;
-//         characterId: string;
-//         value: number;
-//     }
-// }
+    static async create(areas: number, tilesPerLot = 16, lotsPerBlock = 4, blocksPerArea = 6): Promise<City.Raw> {
+        const LOT_MAX_VALUE = 500000;
+        const GOVERNMENT_CHARACTER_ID = "gov";
+        let tiles: City.Tile[] = [];
+        for (let area = 0; area < areas; area++) {
+            for (let block = 0; block < blocksPerArea; block++) {
+                for (let lot = 0; lot < lotsPerBlock; lot++) {
+                    for (let tile = 0; tile < tilesPerLot; tile++) {
+                        //TODO: Add lot block and area info to tile positions
+                        let x = tile % Math.sqrt(tilesPerLot);
+                        let y = Math.floor(tile / Math.sqrt(tilesPerLot));
+                        tiles.push({
+                            x: x,
+                            y: y,
+                            rotation: 0,
+                            lotId: lot,
+                            blockId: block,
+                            areaId: area,
+                            texture: Data.City.TileTexture.Land,
+                            characterId: GOVERNMENT_CHARACTER_ID,
+                            value: LOT_MAX_VALUE / tilesPerLot
+                        });
+                    }
+                }
+            }
+        }
+        return {
+            tiles: tiles
+        }
+    }
+}
+namespace City {
+    export interface Raw {
+        tiles: Tile[];
+    }
+
+    export interface Tile {
+        x: number;
+        y: number;
+        rotation: number;
+        lotId: number;
+        blockId: number;
+        areaId: number;
+        texture: Data.City.TileTexture;
+        characterId: string;
+        value: number;
+    }
+}
