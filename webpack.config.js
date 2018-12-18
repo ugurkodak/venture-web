@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('path'); //Note: Why is path working while not installed?
 const WebpackShellPlugin = require('webpack-shell-plugin');
 
 module.exports = {
@@ -14,7 +14,7 @@ module.exports = {
         extensions: ['.ts', '.tsx', '.js'],
     },
     plugins: [
-        new WebpackShellPlugin({ onBuildEnd: 'node server.js' }) // TODO: Fix deprecation warning
+        new WebpackShellPlugin({ onBuildEnd: 'firebase serve' }) // TODO: Fix deprecation warning
     ],
     module: {
         rules: [
