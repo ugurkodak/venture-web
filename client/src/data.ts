@@ -1,4 +1,4 @@
-import firebase from 'firebase/app';
+import * as firebase from 'firebase/app';
 import 'firebase/database';
 import 'firebase/auth';
 
@@ -107,12 +107,12 @@ export namespace Data {
 class User {
     public id: string;
     public meta: Data.User.Meta;
-    private _raw: User.Raw | null;
+    // private _raw: User.Raw | null;
 
     constructor(id: string, meta: Data.User.Meta) {
         this.id = id;
         this.meta = meta;
-        this._raw = null;
+        // this._raw = null;
     }
 }
 
@@ -125,12 +125,12 @@ namespace User {
 class Character {
     public id: string;
     public meta: Data.Character.Meta;
-    private _raw: Character.Raw | null;
+    // private _raw: Character.Raw | null;
 
     constructor(id: string, meta: Data.Character.Meta) {
         this.id = id;
         this.meta = meta;
-        this._raw = null;
+        // this._raw = null;
     }
 
     public getFullName(): string {
@@ -147,12 +147,12 @@ namespace Character {
 class City {
     public id: string;
     public meta: Data.City.Meta;
-    private _raw: City.Raw | null;
+    // private _raw: City.Raw | null;
 
     constructor(id: string, meta: Data.City.Meta) {
         this.id = id;
         this.meta = meta;
-        this._raw = null;
+        // this._raw = null;
     }
 
     static async create(areas: number, tilesPerLot = 16, lotsPerBlock = 4, blocksPerArea = 6): Promise<City.Raw> {

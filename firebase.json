@@ -2,8 +2,10 @@
   "database": {
     "rules": "database.rules.json"
   },
+  "functions": {
+  },
   "hosting": {
-    "public": "public",
+    "public": "client/public",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -12,8 +14,11 @@
     "rewrites": [
       {
         "source": "**",
-        "destination": "/index.html"
+        "destination": "client/public/index.html"
       }
     ]
+  },
+  "storage": {
+    "rules": "storage.rules"
   }
 }

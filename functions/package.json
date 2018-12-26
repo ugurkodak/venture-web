@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "build": "tsc",
+    "start": "concurrently \"firebase serve --only functions\" \"tsc --watch\""
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "firebase-admin": "^6.4.0",
+    "firebase-functions": "^2.1.0"
+  },
+  "devDependencies": {
+    "concurrently": "^4.1.0",
+    "typescript": "^3.2.2"
+  }
+}

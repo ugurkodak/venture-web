@@ -1,0 +1,18 @@
+{
+  "scripts": {
+    "build": "webpack --config webpack.config.js",
+    "serve": "firebase serve --only hosting",
+    "start": "webpack --start --watch --config webpack.config.js"
+  },
+  "dependencies": {
+    "firebase": "^5.7.1",
+    "pixi.js": "^4.8.4"
+  },
+  "devDependencies": {
+    "@types/pixi.js": "^4.8.6",
+    "ts-loader": "^5.3.2",
+    "typescript": "^3.2.2",
+    "webpack": "^4.28.2",
+    "webpack-cli": "^3.1.2"
+  }
+}
