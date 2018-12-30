@@ -1,9 +1,9 @@
 {
   "name": "venture-web",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Ugur Kodak",
   "license": "MIT",
-  "description": "Venture web client",
+  "description": "Venture JavaScript source",
   "repository": {
     "type": "git",
     "url": "https://github.com/ugurkodak/venture-web.git"
