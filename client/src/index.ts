@@ -1,5 +1,5 @@
-import * as ui from './ui';
+import { init } from './ui';
 
 (async () => {
-    await ui.instance().init();
+    init();
 })();

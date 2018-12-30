@@ -1,15 +1,14 @@
 //** User modelmap */
-export default class User {
-    public id: string;
-    public meta: IUserMeta;
-    //@ts-ignore
-    private _raw: IUserRaw | null;
 
-    constructor(id: string, meta: IUserMeta) {
-        this.id = id;
-        this.meta = meta;
-        this._raw = null;
-    }
+export let id: string;
+export let meta: IUserMeta;
+//@ts-ignore
+let _raw: IUserRaw | null;
+
+export function init(id: string, meta: IUserMeta) {
+    id = id;
+    meta = meta;
+    _raw = null;
 }
 
 //Modifiable data types stored in user document

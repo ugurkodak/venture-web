@@ -1,15 +1,14 @@
 //** City modelmap */
-export default class City {
-    public id: string;
-    public meta: ICityMeta;
-    //@ts-ignore
-    private _raw: ICityRaw | null;
 
-    constructor(id: string, meta: ICityMeta) {
-        this.id = id;
-        this.meta = meta;
-        this._raw = null;
-    }
+export let id: string;
+export let meta: ICityMeta;
+//@ts-ignore
+let _raw: ICityRaw | null;
+
+export function init(id: string, meta: ICityMeta) {
+    id = id;
+    meta = meta;
+    _raw = null;
 }
 
 //Modifiable data types stored in city document

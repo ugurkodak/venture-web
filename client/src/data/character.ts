@@ -1,19 +1,18 @@
-//** Character modelmap */
-export default class Character {
-    public id: string;
-    public meta: ICharacterMeta;
-    //@ts-ignore
-    private _raw: ICharacterRaw | null;
+// Character modelmap
 
-    constructor(id: string, meta: ICharacterMeta) {
-        this.id = id;
-        this.meta = meta;
-        this._raw = null;
-    }
+export let id: string;
+export let meta: ICharacterMeta;
+//@ts-ignore
+let _raw: ICharacterRaw | null;
 
-    public getFullName(): string {
-        return this.meta.prefix + ' ' + this.meta.firstName + ' ' + this.meta.lastName;
-    }
+export function init(id: string, meta: ICharacterMeta) {
+    id = id;
+    meta = meta;
+    _raw = null;
+}
+
+export function getFullName(): string {
+    return meta.prefix + ' ' + meta.firstName + ' ' + meta.lastName;
 }
 
 //Modifiable data types stored in character document
