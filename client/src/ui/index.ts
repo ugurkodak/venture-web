@@ -1,17 +1,4 @@
-import * as ex from 'excalibur';
-import * as res from './resources';
-import * as notice from './notice-manager'
+import * as resources from './resources';
 
-export const engine = new ex.Engine({
-    displayMode: ex.DisplayMode.FullScreen,
-    pointerScope: ex.Input.PointerScope.Canvas,
-    backgroundColor: ex.Color.Black,
-});
-
-const loader = new ex.Loader(res.LIST);
-
-export async function init() {
-    await engine.start(loader);
-    notice.addToQueue(notice.NoticeId.MAIN_MENU);
-    notice.open();
-}
+export { default } from './actor';
+export { resources as Resources };
