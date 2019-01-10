@@ -1,6 +1,6 @@
 import { loader, Texture } from "pixi.js";
 
-export const LIST = [
+const LIST = [
     'images/texture_white_paper.png',
     'images/texture_white_paper_close_0.png',
     'images/texture_white_paper_close_1.png',

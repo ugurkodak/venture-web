@@ -1,8 +1,8 @@
 import { app } from "../..";
 import * as res from '../resources';
 import { Sprite, Text } from "pixi.js";
-import Actor from "../actor";
 import * as data from "../../data";
+import { Actor } from "..";
 
 const a4Ratio = Math.sqrt(2);
 const maxScreenCoverageRatio = 0.8;

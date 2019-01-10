@@ -1,6 +1,6 @@
 import { Application, Sprite, Graphics } from 'pixi.js';
-import Actor, { Resources } from './ui';
 import Notice from './ui/prefabs';
+import { Resources, Actor, RendererScaleMode } from './ui';
 
 // Create a fullscreen pixi app
 export const app = new Application({
@@ -49,11 +49,12 @@ function testActor() {
 
     let paper = new Sprite(Resources.getTexture(Resources.TextureId.WHITE_PAPER));
 
-    let act = new Actor(paper, true);
+    let act = new Actor(paper);
     act.x = 500;
-    act.x = 500;
+    act.useDebugBorder(true);
+    act.setRendererScaleMode(RendererScaleMode.MAINTAIN_ASPECT_RATIO);
+    act.setRendererScaleMode(RendererScaleMode.NONE);
     // act.addChild(red300);
-    // act.isUsingDebugBorder = true;
     // act.addChild(green100);
     // act.x = 100;
     // act.y = 100;
