@@ -9,11 +9,11 @@ export const LIST = [
 ];
 
 export enum TextureId {
-    TEXTURE_WHITE_PAPER,
-    TEXTURE_WHITE_PAPER_CLOSE_0,
-    TEXTURE_WHITE_PAPER_CLOSE_1,
-    TEXTURE_WHITE_PAPER_CLOSE_2,
-    TEXTURE_DICE
+    WHITE_PAPER,
+    WHITE_PAPER_CLOSE_0,
+    WHITE_PAPER_CLOSE_1,
+    WHITE_PAPER_CLOSE_2,
+    DICE
 }
 
 //Promisify pixi callback style load function for organisation

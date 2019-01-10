@@ -20,6 +20,7 @@ export const database = firebase.initializeApp({
     messagingSenderId: "356906761499"
 }).database().ref();
 
+// Registers a character, all user registration is done by OAuth
 export async function register(uid: string, characterMeta: character.ICharacterMeta): Promise<void> {
     try {
         let updates: any = {};

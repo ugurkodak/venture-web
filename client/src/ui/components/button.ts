@@ -1,6 +1,6 @@
-import { Sprite } from "pixi.js";
+import { Text } from "pixi.js";
 
-export default class Button extends Sprite {
+export default class Button extends Text {
     constructor() {
         super();
     }

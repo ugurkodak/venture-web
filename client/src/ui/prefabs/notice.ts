@@ -1,21 +1,33 @@
 import { app } from "../..";
 import * as res from '../resources';
-import { Sprite } from "pixi.js";
+import { Sprite, Text } from "pixi.js";
 import Actor from "../actor";
+import * as data from "../../data";
 
 const a4Ratio = Math.sqrt(2);
 const maxScreenCoverageRatio = 0.8;
 
 export default class Notice extends Actor {
     constructor() {
-        super(new Sprite(res.getTexture(res.TextureId.TEXTURE_WHITE_PAPER)));
-        this.respondToRendererSize();
-        
+        super(new Sprite(res.getTexture(res.TextureId.WHITE_PAPER)));
+        // Login button
+        let button_login = new Text('Login', {
+            fontFamily: 'Courier New',
+            fill: "#2fd526",
+        });
+        button_login.on('click', async () => {
+            await data.login();
+            console.log(data.User.id);
+        });
+        button_login.x = this.x;
+        button_login.y = this.y;
+        this.addChild(button_login);
+
         // TODO: Maybe adding event listeners to the same event 
         // from different places is a bad idea.
-        window.addEventListener('resize', () => {
-            this.respondToRendererSize();
-        });
+        // window.addEventListener('resize', () => {
+        //     this.respondToRendererSize();
+        // });
     }
 
     public respondToRendererSize() {
